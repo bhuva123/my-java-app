@@ -1,0 +1,11 @@
+name: Java Lint via Reusable Workflow
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  lint:
+    uses: bhuva123/code-quality-reusable/.github/workflows/reusable-code-lint.yml@main
