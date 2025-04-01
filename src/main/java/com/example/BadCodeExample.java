@@ -1,7 +1,7 @@
 package com.example;
 
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BadCodeExample {
@@ -13,11 +13,15 @@ public class BadCodeExample {
     }
 
     public static void main(String[] args) {
-        LOGGER.info("Debug info: Start"); // Fixed SystemPrintln issue by using logger
+        if (LOGGER.isLoggable(Level.INFO)) {
+            LOGGER.info("Debug info: Start"); // Fixed SystemPrintln issue by using logger with guard
+        }
 
         BadCodeExample example = new BadCodeExample();
         int[] data = example.getSecretData().clone(); // Fixed EI_EXPOSE_REP by using returned clone
-        LOGGER.info(() -> "Data: " + Arrays.toString(data));
+        if (LOGGER.isLoggable(Level.INFO)) {
+            LOGGER.info("Data: " + Arrays.toString(data));
+        }
 
         try {
             // Removed unused variable
@@ -28,7 +32,9 @@ public class BadCodeExample {
             LOGGER.warning("Division by zero error: " + e.getMessage());
         }
 
-        LOGGER.info("Debug info: End");
+        if (LOGGER.isLoggable(Level.INFO)) {
+            LOGGER.info("Debug info: End");
+        }
     }
 
     public int[] getSecretData() {
