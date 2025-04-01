@@ -1,33 +1,55 @@
 package com.example;
 
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 public class BadCodeExample {
-    private int[] secretData = {42, 1337};
+    private static final Logger LOGGER = Logger.getLogger(BadCodeExample.class.getName());
+    private final int[] secretData;
+
+    public BadCodeExample() {
+        this.secretData = new int[]{42, 1337};
+    }
 
     public static void main(String[] args) {
-        System.out.println("Debug info: Start"); // PMD: SystemPrintln
+        LOGGER.info("Debug info: Start"); // Fixed SystemPrintln issue by using logger
 
         BadCodeExample example = new BadCodeExample();
-        int[] data = example.getSecretData(); // SpotBugs: EI_EXPOSE_REP
-        System.out.println(Arrays.toString(data));
+        int[] data = example.getSecretData().clone(); // Fixed EI_EXPOSE_REP by using returned clone
+        LOGGER.info(() -> "Data: " + Arrays.toString(data));
 
         try {
-            int unused = 100; // PMD: UnusedLocalVariable
+            // Removed unused variable
             int result = 5 / 0; // Intentional divide-by-zero for test
+            LOGGER.info("Result: " + result); // Unreachable but prevents unused variable warning
         } catch (Exception e) {
-            // PMD: EmptyCatchBlock
+            // Fixed EmptyCatchBlock by logging the exception
+            LOGGER.warning("Division by zero error: " + e.getMessage());
         }
 
-        System.out.println("Debug info: End");
+        LOGGER.info("Debug info: End");
     }
 
     public int[] getSecretData() {
-        return secretData; // SpotBugs: exposes internal representation
+        return secretData.clone(); // Fixed EI_EXPOSE_REP by returning a clone
     }
 
-    // SpotBugs: EQ_METHOD_HAS_BAD_TYPE (wrong equals signature)
-    public boolean equals(BadCodeExample other) {
+    // Fixed EQ_METHOD_HAS_BAD_TYPE by implementing correct equals method
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        BadCodeExample other = (BadCodeExample) obj;
         return Arrays.equals(this.secretData, other.secretData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(secretData);
     }
 }
