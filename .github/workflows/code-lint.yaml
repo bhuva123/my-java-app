@@ -1,4 +1,4 @@
-name: Java Lint via Reusable Workflow
+name: Java Lint via Reusable Workflow test
 
 on:
   push:
